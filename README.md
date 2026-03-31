@@ -1,6 +1,6 @@
 # AI Job Description Analyzer
 
-A Python CLI tool that uses the OpenAI API to analyze job descriptions and return structured JSON output.
+An AI-powered CLI tool that analyzes job descriptions to extract key skills, responsibilities, and generate resume optimization insights using LLM APIs. This project was built to help developers quickly understand job requirements and tailor their resumes more effectively using AI.
 
 ## Features
 - Extracts likely job title
@@ -29,3 +29,20 @@ This is version 1 of the project. Future versions will include:
 - cleaner output formatting
 - resume-to-job matching
 - portfolio-ready improvements
+
+## Sample Output
+
+```json
+{
+  "job_title_guess": "AI Engineer - Autonomous Agents",
+  "seniority_level": "Mid to Senior",
+  "required_skills": [
+    "Prompt engineering",
+    "LLM integration",
+    "RAG systems"
+  ],
+  "resume_suggestions": [
+    "Highlight AI agent experience",
+    "Showcase prompt engineering projects"
+  ]
+}
