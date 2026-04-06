@@ -1,5 +1,6 @@
 import json
 import os
+import textwrap
 from dotenv import load_dotenv
 from openai import OpenAI, RateLimitError
 
@@ -85,6 +86,26 @@ def save_analysis(result: dict, filename: str = "analysis_output.json") -> None:
         json.dump(result, file, indent=2)
 
 
+def print_wrapped(text: str, width: int = 80) -> None:
+    print(textwrap.fill(text, width=width))
+
+
+def print_list(title: str, items: list[str]) -> None:
+    print(f"\n{title}:")
+    if not items:
+        print("- None")
+        return
+
+    for item in items:
+        wrapped = textwrap.fill(
+            item,
+            width=76,
+            initial_indent="- ",
+            subsequent_indent="  ",
+        )
+        print(wrapped)
+
+
 def print_pretty_report(result: dict) -> None:
     print("\n" + "=" * 60)
     print("RESUME VS JOB MATCH REPORT")
@@ -94,28 +115,19 @@ def print_pretty_report(result: dict) -> None:
     print(f"Seniority Level: {result.get('seniority_level', 'N/A')}")
     print(f"Match Score: {result.get('match_score', 'N/A')}%")
 
-    print("\nRequired Skills:")
-    for skill in result.get("required_skills", []):
-        print(f"- {skill}")
-
-    print("\nPreferred Skills:")
-    for skill in result.get("preferred_skills", []):
-        print(f"- {skill}")
-
-    print("\nResume Strengths:")
-    for item in result.get("resume_strengths", []):
-        print(f"- {item}")
-
-    print("\nMissing or Weak Skills:")
-    for item in result.get("missing_or_weak_skills", []):
-        print(f"- {item}")
+    print_list("Required Skills", result.get("required_skills", []))
+    print_list("Preferred Skills", result.get("preferred_skills", []))
+    print_list("Resume Strengths", result.get("resume_strengths", []))
+    print_list("Missing or Weak Skills", result.get("missing_or_weak_skills", []))
 
     print("\nFit Assessment:")
-    print(result.get("fit_assessment", "N/A"))
+    fit_assessment = result.get("fit_assessment", "N/A")
+    print_wrapped(fit_assessment)
 
-    print("\nTailored Resume Suggestions:")
-    for item in result.get("tailored_resume_suggestions", []):
-        print(f"- {item}")
+    print_list(
+        "Tailored Resume Suggestions",
+        result.get("tailored_resume_suggestions", [])
+    )
 
     print("\n" + "=" * 60)
 

@@ -1,21 +1,24 @@
 # AI Job Description Analyzer
 
-An AI-powered CLI tool that analyzes job descriptions and compares resumes against job requirements to generate match scores, skill-gap analysis, and tailored resume suggestions.
+An AI-powered Python CLI tool that analyzes job descriptions and compares them against resume content to generate match scores, identify skill gaps, and produce tailored resume recommendations using LLM APIs.
 
-## Features
-- Extracts likely job title
-- Estimates seniority level
-- Identifies required and preferred skills
-- Summarizes key responsibilities
-- Generates fit assessment
-- Suggests resume improvements
+## Why I Built This
 
-## Version 2 Features
-- Compare resume text against a job description
-- Generate a match score from 0 to 100
-- Identify strengths and missing skills
-- Produce tailored resume improvement suggestions
-- Save structured output to JSON
+I built this project to solve a real job search problem: quickly understanding whether a resume aligns with a role and what should be improved before applying. The tool helps turn unstructured job descriptions and resume text into actionable, structured insights.
+
+## Version History
+
+### v1 - Job Description Analyzer
+- Extracted likely job title, seniority, required skills, and responsibilities
+- Generated fit assessment and resume suggestions
+- Saved structured analysis to JSON
+
+### v2 - Resume vs Job Matcher
+- Compares resume text against a job description
+- Generates a match score from 0 to 100
+- Identifies strengths and missing skills
+- Produces tailored resume improvement suggestions
+- Displays a formatted terminal report
 
 ## Tech Stack
 - Python
@@ -31,25 +34,30 @@ An AI-powered CLI tool that analyzes job descriptions and compares resumes again
 4. Run:
    python main.py
 
-## Notes
-This is version 1 of the project. Future versions will include:
-- cleaner output formatting
-- resume-to-job matching
-- portfolio-ready improvements
+## Screenshot
+
+![Resume vs Job Match Report](screenshots/polished_v2_terminal_ai_job_description_analyzer_p1.png)
+![Resume vs Job Match Report](screenshots/polished_v2_terminal_ai_job_description_analyzer_p2.png)
 
 ## Sample Output
 
 ```json
 {
-  "job_title_guess": "AI Engineer - Autonomous Agents",
-  "seniority_level": "Mid to Senior",
+  "job_title_guess": "Junior Software Engineer",
+  "seniority_level": "Junior",
   "required_skills": [
-    "Prompt engineering",
-    "LLM integration",
-    "RAG systems"
+    "Programming in Python",
+    "Version control with Git",
+    "Basic software development principles"
   ],
-  "resume_suggestions": [
-    "Highlight AI agent experience",
-    "Showcase prompt engineering projects"
+  "match_score": 70,
+  "resume_strengths": [
+    "Experience with Django web framework",
+    "Implemented REST APIs",
+    "Experience with SQL databases"
+  ],
+  "missing_or_weak_skills": [
+    "No explicit mention of Agile or Scrum",
+    "Limited cloud platform experience"
   ]
 }
