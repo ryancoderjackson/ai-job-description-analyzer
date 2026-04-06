@@ -1,6 +1,6 @@
 # AI Job Description Analyzer
 
-An AI-powered CLI tool that analyzes job descriptions to extract key skills, responsibilities, and generate resume optimization insights using LLM APIs. This project was built to help developers quickly understand job requirements and tailor their resumes more effectively using AI.
+An AI-powered CLI tool that analyzes job descriptions and compares resumes against job requirements to generate match scores, skill-gap analysis, and tailored resume suggestions.
 
 ## Features
 - Extracts likely job title
@@ -9,6 +9,13 @@ An AI-powered CLI tool that analyzes job descriptions to extract key skills, res
 - Summarizes key responsibilities
 - Generates fit assessment
 - Suggests resume improvements
+
+## Version 2 Features
+- Compare resume text against a job description
+- Generate a match score from 0 to 100
+- Identify strengths and missing skills
+- Produce tailored resume improvement suggestions
+- Save structured output to JSON
 
 ## Tech Stack
 - Python

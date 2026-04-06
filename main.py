@@ -1,7 +1,7 @@
 import json
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, RateLimitError
 
 load_dotenv()
 
@@ -12,9 +12,25 @@ if not api_key:
 client = OpenAI(api_key=api_key)
 
 
-def analyze_job_description(job_description: str) -> dict:
+def get_multiline_input(prompt_text: str) -> str:
+    print(f"\n{prompt_text}")
+    print("Type END on a new line when finished.\n")
+
+    lines = []
+    while True:
+        line = input()
+        if line.strip().upper() == "END":
+            break
+        lines.append(line)
+
+    return "\n".join(lines).strip()
+
+
+def analyze_resume_vs_job(resume_text: str, job_description: str) -> dict:
     prompt = f"""
-You are a career assistant. Analyze the following job description and return JSON only.
+You are a technical resume analysis assistant.
+
+Compare the candidate resume to the job description and return JSON only.
 
 Return this exact structure:
 {{
@@ -22,23 +38,39 @@ Return this exact structure:
   "seniority_level": "",
   "required_skills": [],
   "preferred_skills": [],
-  "key_responsibilities": [],
+  "resume_strengths": [],
+  "missing_or_weak_skills": [],
+  "match_score": 0,
   "fit_assessment": "",
-  "resume_suggestions": []
+  "tailored_resume_suggestions": []
 }}
 
-Job description:
+Rules:
+- "match_score" must be an integer from 0 to 100.
+- Only return valid JSON.
+- Be realistic, not overly generous.
+- Base the analysis only on the provided resume and job description.
+
+Resume:
+{resume_text}
+
+Job Description:
 {job_description}
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {"role": "system", "content": "You return only valid JSON."},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.3,
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {"role": "system", "content": "You return only valid JSON."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.2,
+        )
+    except RateLimitError:
+        raise ValueError(
+            "OpenAI API quota/billing issue: check your billing setup and available credits."
+        )
 
     content = response.choices[0].message.content.strip()
 
@@ -53,26 +85,58 @@ def save_analysis(result: dict, filename: str = "analysis_output.json") -> None:
         json.dump(result, file, indent=2)
 
 
+def print_pretty_report(result: dict) -> None:
+    print("\n" + "=" * 60)
+    print("RESUME VS JOB MATCH REPORT")
+    print("=" * 60)
+
+    print(f"\nJob Title Guess: {result.get('job_title_guess', 'N/A')}")
+    print(f"Seniority Level: {result.get('seniority_level', 'N/A')}")
+    print(f"Match Score: {result.get('match_score', 'N/A')}%")
+
+    print("\nRequired Skills:")
+    for skill in result.get("required_skills", []):
+        print(f"- {skill}")
+
+    print("\nPreferred Skills:")
+    for skill in result.get("preferred_skills", []):
+        print(f"- {skill}")
+
+    print("\nResume Strengths:")
+    for item in result.get("resume_strengths", []):
+        print(f"- {item}")
+
+    print("\nMissing or Weak Skills:")
+    for item in result.get("missing_or_weak_skills", []):
+        print(f"- {item}")
+
+    print("\nFit Assessment:")
+    print(result.get("fit_assessment", "N/A"))
+
+    print("\nTailored Resume Suggestions:")
+    for item in result.get("tailored_resume_suggestions", []):
+        print(f"- {item}")
+
+    print("\n" + "=" * 60)
+
+
 def main() -> None:
-    print("Paste the job description below. Type END on a new line when finished.\n")
+    print("AI Resume vs Job Matcher v2")
 
-    lines = []
-    while True:
-        line = input()
-        if line.strip().upper() == "END":
-            break
-        lines.append(line)
+    resume_text = get_multiline_input("Paste your resume text below.")
+    if not resume_text:
+        print("No resume text provided.")
+        return
 
-    job_description = "\n".join(lines).strip()
-
+    job_description = get_multiline_input("Paste the job description below.")
     if not job_description:
         print("No job description provided.")
         return
 
     print("\nAnalyzing...\n")
-    result = analyze_job_description(job_description)
+    result = analyze_resume_vs_job(resume_text, job_description)
 
-    print(json.dumps(result, indent=2))
+    print_pretty_report(result)
     save_analysis(result)
     print("\nAnalysis saved to analysis_output.json")
 
